@@ -7,10 +7,10 @@ export default function DashboardSummary({ data, repoCount, contributorCount }:{
 }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <KpiCard label="Repositories" value={repoCount ?? 0} />
-      <KpiCard label="Open PRs" value={data?.totalOpenPRs ?? 0} />
-      <KpiCard label="Merged PRs" value={data?.totalMergedPRs ?? 0} />
-      <KpiCard label="Contributors" value={contributorCount ?? 0} />
+      <KpiCard label="Repositories" value={repoCount ?? 0} href="/repos" />
+      <KpiCard label="Open PRs" value={data?.totalOpenPRs ?? 0} href="/prs?status=OPEN" />
+      <KpiCard label="Merged PRs" value={data?.totalMergedPRs ?? 0} href="/prs?status=MERGED" />
+      <KpiCard label="Contributors" value={contributorCount ?? 0} href="/contributors" />
     </div>
   );
 }
