@@ -19,8 +19,6 @@ This project simulates a **Security PR Bot analytics platform**:
 - Visualizes **risk distribution**, **status breakdown**, and **trend analytics**
 - Supports **multi-level drill-down**: from high-level summary → PR list → detailed comments
 
-![Dashboard Preview](preview.png)
-
 [Features](#features) •
 [Architecture](#architecture) •
 [Usage](#usage) •
