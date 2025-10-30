@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Force light theme: white background, dark text */
+body {
+  background: #ffffff;
+  color: #111827; /* gray-900 */
+  font-family: Arial, Helvetica, sans-serif;
+}
