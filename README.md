@@ -153,6 +153,41 @@ Notes:
 
 ---
 
+## 📊 Data shown and GitHub field origins
+
+What powers each widget:
+- **Severity Donut**: derived metric from the bot (`riskSummary.overallSeverity`) – not a native GitHub field.
+- **Status Bars**: counts of PR `state` with GitHub’s `merged_at/merged` mapped to UI `state: "merged"`.
+- **Trend**: monthly buckets from `created_at` and `merged_at`.
+- **KPIs**: totals computed from PR list; repository and contributor counts from repos and authors.
+
+GitHub naming alignment (edge) → UI model (inside):
+- Added GitHub-native types: `GithubPullRequest`, `GithubUser`, `GithubRepoRef` with snake_case: `id`, `number`, `title`, `state` ("open" | "closed"), `user`, `created_at`, `updated_at`, `merged_at`, `additions`, `deletions`, `changed_files`, `base.repo`/`head.repo`.
+- Normalizer maps to UI camelCase: `created_at → createdAt`, `changed_files → changedFiles`, `user.login → author`, `base/head.repo.id → repoId`, and closed+merged → `state: "merged"`.
+- GitHub URLs: `html_url → htmlUrl` and surfaced in UI (PR list and details).
+
+Docs for reference:
+- List Pull Requests: `https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests`
+- About Pull Requests: `https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#about-pull-requests`
+
+---
+
+## 🔄 Future API integration (batch vs stream)
+
+- **Batch/backfill**
+  - Use “List pull requests” per repo with pagination (filter by `state`, `sort=updated`).
+  - Periodic jobs (e.g., every 5–10 min) pull deltas since last `updated_at`.
+  - Great for initial population and recomputing aggregates.
+
+- **Stream/incremental**
+  - Subscribe to webhooks: `pull_request`, `pull_request_review`, `issue_comment`, `push`.
+  - Normalize events into the same UI model and update aggregates in near real time.
+  - Prefer stream for freshness; keep batch as safety net.
+
+Data flow: GitHub JSON → normalize → enrich with bot `riskSummary` → cache/store → UI.
+
+---
+
 ## ✅ Commit Checklist
 
 - [x] Scaffold pages and components

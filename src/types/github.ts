@@ -6,6 +6,11 @@ export interface Repository {
   createdAt?: string;
   default_branch?: string;
   html_url?: string;
+  language?: string;
+  topics?: string[];
+  stargazersCount?: number;
+  forksCount?: number;
+  openIssuesCount?: number;
 }
 
 export interface CommentUser {
@@ -58,6 +63,7 @@ export interface PullRequest {
   riskSummary?: RiskSummary;
   findings?: Finding[];
   comments?: Comment[];
+  htmlUrl?: string; // maps from GitHub html_url when available
 }
 
 export interface DashboardSummary {
@@ -72,4 +78,54 @@ export interface Contributor {
   id: string | number;
   login: string;
   avatar_url?: string;
+}
+
+// GitHub-native shapes (subset) to keep parity with REST API responses
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28
+export interface GithubUser {
+  login: string;
+  id: number;
+  avatar_url?: string;
+  type?: "User" | "Bot";
+}
+
+export interface GithubRepoRef {
+  id: number;
+  name: string;
+  full_name?: string;
+  owner?: GithubUser;
+  html_url?: string;
+  default_branch?: string;
+  created_at?: string;
+  description?: string | null;
+  language?: string | null;
+  topics?: string[];
+  stargazers_count?: number;
+  forks_count?: number;
+  open_issues_count?: number;
+}
+
+export interface GithubContributor {
+  id: number;
+  login: string;
+  avatar_url?: string;
+  html_url?: string;
+  contributions?: number;
+}
+
+export interface GithubPullRequest {
+  id: number;
+  number: number;
+  title: string;
+  state: "open" | "closed"; // merged PRs are closed + merged=true
+  user: GithubUser;
+  created_at: string;
+  updated_at: string;
+  merged_at: string | null;
+  merged?: boolean;
+  additions?: number;
+  deletions?: number;
+  changed_files?: number;
+  base?: { repo?: GithubRepoRef };
+  head?: { repo?: GithubRepoRef };
 }

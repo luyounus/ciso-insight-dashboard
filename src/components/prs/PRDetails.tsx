@@ -8,7 +8,14 @@ export default function PRDetails({ pr }: { pr: PullRequest }) {
   return (
     <div className="space-y-6">
       <header className="bg-white rounded-xl shadow p-4">
-        <h1 className="text-xl font-semibold mb-1">{pr.title}</h1>
+        <h1 className="text-xl font-semibold mb-1">
+          {pr.title}
+          {pr.htmlUrl ? (
+            <a href={pr.htmlUrl} target="_blank" rel="noreferrer" className="ml-2 text-sm text-blue-600 hover:underline">
+              View on GitHub ↗
+            </a>
+          ) : null}
+        </h1>
         <div className="flex flex-wrap gap-3 text-sm text-gray-600">
           <SeverityPill value={overall} />
           <span>State: {pr.state}</span>

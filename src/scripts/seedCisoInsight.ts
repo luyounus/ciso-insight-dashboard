@@ -13,8 +13,8 @@ interface CommentUser { login: string; type?: "User" | "Bot"; id?: number; avata
 interface Comment { id: string | number; user: CommentUser; body: string; createdAt: string; in_reply_to_id?: string | number; metadata?: { severity?: string; vulnerabilityTypes?: string[] } }
 interface Finding { id: string; type: "SECRET_EXPOSURE" | "INJECTION" | "AUTHORIZATION" | "DEPENDENCY"; severity: Severity; message: string; file_path: string; line: number }
 interface RiskSummary { overallSeverity: Severity; score: number; countsBySeverity?: Record<string, number>; categories?: Record<string, number>; mttr_days?: number }
-interface PullRequest { id: string | number; number: number; title: string; state: "open" | "closed" | "merged"; author: string; repoId: string | number; createdAt: string; updatedAt: string; mergedAt: string | null; additions: number; deletions: number; changedFiles: number; riskSummary: RiskSummary; findings: Finding[]; comments: Comment[] }
-interface Repository { id: string | number; name: string; owner: string; description?: string; createdAt: string; default_branch: string; html_url: string }
+interface PullRequest { id: string | number; number: number; title: string; state: "open" | "closed" | "merged"; author: string; repoId: string | number; createdAt: string; updatedAt: string; mergedAt: string | null; additions: number; deletions: number; changedFiles: number; riskSummary: RiskSummary; findings: Finding[]; comments: Comment[]; htmlUrl?: string }
+interface Repository { id: string | number; name: string; owner: string; description?: string; createdAt: string; default_branch: string; html_url: string; language?: string; topics?: string[]; stargazersCount?: number; forksCount?: number; openIssuesCount?: number }
 interface Contributor { id: string; login: string; avatar_url?: string }
 
 const contributors: Contributor[] = Array.from({ length: 12 }).map(() => ({
@@ -33,6 +33,11 @@ const repositories: Repository[] = Array.from({ length: NUM_REPOS }).map(() => {
     createdAt: faker.date.past({ years: 2 }).toISOString(),
     default_branch: "main",
     html_url: `https://github.com/example/${name}`,
+    language: faker.helpers.arrayElement(["TypeScript", "Go", "Python", "Rust", "JavaScript"]),
+    topics: faker.helpers.arrayElements(["security", "bot", "ci", "lint", "policy", "analysis", "github"], 3),
+    stargazersCount: faker.number.int({ min: 0, max: 5000 }),
+    forksCount: faker.number.int({ min: 0, max: 500 }),
+    openIssuesCount: faker.number.int({ min: 0, max: 200 }),
   };
 });
 
@@ -73,9 +78,12 @@ repositories.forEach((repo) => {
       { id: faker.string.uuid(), user: devUser, body: "Thanks, addressing feedback.", createdAt: faker.date.between({ from: createdAt, to: updatedAt }).toISOString() },
     ];
 
+    const prNumber = faker.number.int({ min: 1, max: 9999 });
+    const prHtmlUrl = `${repo.html_url}/pull/${prNumber}`;
+
     pullRequests.push({
       id: faker.string.uuid(),
-      number: faker.number.int({ min: 1, max: 9999 }),
+      number: prNumber,
       title: faker.hacker.phrase(),
       state,
       author,
@@ -89,6 +97,7 @@ repositories.forEach((repo) => {
       riskSummary: { overallSeverity, score, countsBySeverity, categories: { code: findings.length }, mttr_days: faker.number.int({ min: 1, max: 10 }) },
       findings,
       comments,
+      htmlUrl: prHtmlUrl,
     });
   }
 });
