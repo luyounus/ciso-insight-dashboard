@@ -37,18 +37,24 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   const totalClosedPRs = pullRequests.filter(pr => pr.state && isClosed(pr.state)).length;
   const totalMergedPRs = pullRequests.filter(pr => pr.state && isMerged(pr.state)).length;
 
-  // If you kept optional fields in DashboardSummary, you can compute them too:
-  // const highRiskPRs = pullRequests.filter(pr => pr.severity === "high" || pr.severity === "critical").length;
-  // const avgRisk = pullRequests.length
-  //   ? Math.round(pullRequests.reduce((s, p) => s + (p.riskScore ?? 0), 0) / pullRequests.length)
-  //   : 0;
+  const averageRiskScore = pullRequests.length
+    ? Math.round(
+        pullRequests.reduce((sum, pr) => sum + (pr.riskSummary?.score ?? (pr as any).riskScore ?? 0), 0) /
+        pullRequests.length
+      )
+    : 0;
+
+  const highRiskPRs = pullRequests.filter((p) => {
+    const sev = (p.riskSummary?.overallSeverity ?? (p as any).severity ?? "").toString().toUpperCase();
+    return sev.includes("HIGH") || sev.includes("CRITICAL");
+  }).length;
 
   return {
     totalOpenPRs,
     totalClosedPRs,
     totalMergedPRs,
-    // highRiskPRs,
-    // averageRiskScore: avgRisk,
+    averageRiskScore,
+    highRiskPRs,
   };
 }
 
